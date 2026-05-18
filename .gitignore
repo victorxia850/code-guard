@@ -6,6 +6,9 @@ dist/
 wheels/
 *.egg-info
 .jbeval
+.python-version
+.idea
+code_guard.egg-info
 
 # Virtual environments
 .venv
