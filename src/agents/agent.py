@@ -1,3 +1,4 @@
+from config.config import get_default_coding_instructions
 from ..config.config import console
 
 
@@ -69,7 +70,32 @@ def get_current_assistant_id() -> str:
 
 
 def rest_agent(agent_name: str,source_agent: str):
-    pass
+    """重置agent或复制另一个agent"""
+    agents_dir = Path.home() / ".deepagents"
+    agents_dir = agents_dir / agent_name
+    if source_agent:
+        source_dir = agents_dir / source_agent
+        source_md = source_dir / "agent.md"
+
+        if not source_md.exists():
+            console.print(f"[bold red]Error:[/bold red] Source agent '{source_agent}' not found or has no agent.md")
+            return
+        source_content = source_md.read_text()
+        action_desc = f"contents of agent '{source_agent}'"
+    else:
+        source_content = get_default_coding_instructions()
+        action_desc = "default"
+
+    if agents_dir.exists():
+        shutil.rmtree(str(agents_dir))
+        console.print(f"Removed existing agent directory: {agent_dir}",style = COLORS["tool"])
+
+    agents_dir.makedir(parents = True,exist_ok = True)
+    agent_md = agents_dir / "agent.md"
+    agent_md.write_text(source_content)
+
+    console.print(f"✓ Agent '{agent_name}' reset to {action_desc}",style = COLORS["primary"])
+    console.print(f"Location: {agent_dir}\n",style = COLORS["dim"])
 
 
 def create_agent_with_config(model,assistant_id: str,tools: list,memory_mode: str = "auto"):
